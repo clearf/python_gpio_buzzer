@@ -117,9 +117,6 @@ def make_app(config_file="./config"):
     return config
     config = generate_config(config_file)
     relay = RelayIntf(config)
-    #t = threading.Thread(target=bt_comm.send_heartbeat)
-    #t.setDaemon(True)
-    #t.start()
     web_app = Gatekeeper(relay, config)
     return web_app
 
