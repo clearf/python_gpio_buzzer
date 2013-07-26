@@ -28,7 +28,7 @@ class RelayIntf(object):
       try:
         # open door
         GPIO.output(self.gpio_pin, GPIO.HIGH)
-        time.sleep(self.open_time)
+        time.sleep(open_time)
         # close door
         GPIO.output(self.gpio_pin, GPIO.LOW)
       except RuntimeError as e:
