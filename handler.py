@@ -115,10 +115,10 @@ def make_app(config_file="./config"):
         except IOError as e:
           print "Unable to write config: ", e
     return config
-    config = generate_config(config_file)
-    relay = RelayIntf(config)
-    web_app = Gatekeeper(relay, config)
-    return web_app
+  config = generate_config(config_file)
+  relay = RelayIntf(config)
+  web_app = Gatekeeper(relay, config)
+  return web_app
 
 if __name__ == '__main__':
   web_app = make_app()
