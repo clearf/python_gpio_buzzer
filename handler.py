@@ -60,40 +60,40 @@ class Gatekeeper(object):
       def __repr__(self):
         return "<Caller('%s', '%s', '%s', '%s')>" % (self.phone_number, self.name, self.is_test, str(self.valid_date))
 
-    def check_authorized_caller(self, phoneNumber, test_call):
-      try: 
-        Session = sessionmaker(bind=self.db)
-        session=Session()
-        results=session.query(self.Caller).filter(self.Caller.phone_number==phoneNumber, self.Caller.is_test==test_call,
-            or_(self.Caller.valid_date==None, self.Caller.valid_date<=date.today() )).all()
-        print results
-        return results != []
-      except Exception as e:
-        log('DB Exception' + str(e))
-        return False
+  def check_authorized_caller(self, phoneNumber, test_call):
+    try: 
+      Session = sessionmaker(bind=self.db)
+      session=Session()
+      results=session.query(self.Caller).filter(self.Caller.phone_number==phoneNumber, self.Caller.is_test==test_call,
+          or_(self.Caller.valid_date==None, self.Caller.valid_date<=date.today() )).all()
+      print results
+      return results != []
+    except Exception as e:
+      log('DB Exception' + str(e))
+      return False
 
-    def application(self, environ, start_response):
-      request = Request(environ)
-      r=twiml.Response()
-      phoneNumber=request.args.get('From')
-      AccountSid=request.args.get('AccountSid')
-      # Make sure the impostors at least know my acct key
-      if AccountSid == self.AccountSid:
-        log("Call from %s" % phoneNumber)
-        if self.check_authorized_caller(phoneNumber,False):
-          #log("Authorized Caller!")
-          if self.serial.open_door():
-            print "opening"
-            r.reject("Busy") 
-          else:
-            r.say("Error with GPIO"); 
-      else:
-        r.reject("Busy") 
-      response = Response(str(r), mimetype='text/xml')
-      return response(environ, start_response)
+  def application(self, environ, start_response):
+    request = Request(environ)
+    r=twiml.Response()
+    phoneNumber=request.args.get('From')
+    AccountSid=request.args.get('AccountSid')
+    # Make sure the impostors at least know my acct key
+    if AccountSid == self.AccountSid:
+      log("Call from %s" % phoneNumber)
+      if self.check_authorized_caller(phoneNumber,False):
+        #log("Authorized Caller!")
+        if self.serial.open_door():
+          print "opening"
+          r.reject("Busy") 
+        else:
+          r.say("Error with GPIO"); 
+    else:
+      r.reject("Busy") 
+    response = Response(str(r), mimetype='text/xml')
+    return response(environ, start_response)
 
-    def __call__(self, environ, start_response):
-      return self.application(environ, start_response)
+  def __call__(self, environ, start_response):
+    return self.application(environ, start_response)
 
 def make_app(config_file="./config"):
   import json
