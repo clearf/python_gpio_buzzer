@@ -38,6 +38,7 @@ class RelayIntf(object):
       t = threading.Thread(target=self.relay_high, args=[open_time])
       t.setDaemon(True)
       t.start()
+      return True
 
 class Gatekeeper(object):
   def __init__(self, relay, config):
