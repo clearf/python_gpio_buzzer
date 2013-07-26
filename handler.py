@@ -1,4 +1,5 @@
 import time
+import os
 import threading
 from werkzeug.wrappers import Request, Response
 from twilio import twiml
@@ -40,7 +41,7 @@ class Gatekeeper(object):
   def __init__(self, relay, config):
     print config
     self.relay = relay
-    self.AccountSid=os.environ['TwilioAccountSID'] 
+    self.AccountSid=os.environ['TWILIO_ACCOUNT_SID'] 
     self.db = create_engine('sqlite:///callers.sqlite')
 
     class Caller(declarative_base()):
