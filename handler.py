@@ -124,4 +124,4 @@ if __name__ == '__main__':
   web_app = make_app()
   from werkzeug.serving import run_simple
   print "Starting server..."
-  run_simple('', 5000, web_app)
+  run_simple('', 5000, web_app, use_reloader=True)
