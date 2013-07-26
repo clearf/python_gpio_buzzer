@@ -1,4 +1,3 @@
-import serial
 import time
 import threading
 from werkzeug.wrappers import Request, Response
@@ -38,9 +37,9 @@ class RelayIntf(object):
         return False
 
 class Gatekeeper(object):
-  def __init__(self, serial, config):
+  def __init__(self, relay, config):
     print config
-    self.serial = serial
+    self.relay = relay
     self.AccountSid=os.environ['TwilioAccountSID'] 
     self.db = create_engine('sqlite:///callers.sqlite')
 
@@ -82,7 +81,7 @@ class Gatekeeper(object):
       log("Call from %s" % phoneNumber)
       if self.check_authorized_caller(phoneNumber,False):
         #log("Authorized Caller!")
-        if self.serial.open_door():
+        if self.relay.open_door():
           print "opening"
           r.reject("Busy") 
         else:
