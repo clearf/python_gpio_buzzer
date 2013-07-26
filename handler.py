@@ -44,21 +44,19 @@ class Gatekeeper(object):
     self.AccountSid=os.environ['TWILIO_ACCOUNT_SID'] 
     self.db = create_engine('sqlite:///callers.sqlite')
 
-    class Caller(declarative_base()):
-      __tablename__ = 'Caller'
-      phone_number=Column(String, primary_key=True)
-      name=Column(String)
-      is_test=Column(Boolean)
-      valid_date=Column(Date)
-
-      def __init__(self, phone_number, name, is_test, valid_date=None):
-        self.phone_number = phone_number
-        self.name = name
-        self.is_test =  is_test
-        self.valid_date=valid_date
-
-      def __repr__(self):
-        return "<Caller('%s', '%s', '%s', '%s')>" % (self.phone_number, self.name, self.is_test, str(self.valid_date))
+  class Caller(declarative_base()):
+    __tablename__ = 'Caller'
+    phone_number=Column(String, primary_key=True)
+    name=Column(String)
+    is_test=Column(Boolean)
+    valid_date=Column(Date)
+    def __init__(self, phone_number, name, is_test, valid_date=None):
+      self.phone_number = phone_number
+      self.name = name
+      self.is_test =  is_test
+      self.valid_date=valid_date
+    def __repr__(self):
+      return "<Caller('%s', '%s', '%s', '%s')>" % (self.phone_number, self.name, self.is_test, str(self.valid_date))
 
   def check_authorized_caller(self, phoneNumber, test_call):
     try: 
