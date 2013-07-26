@@ -24,18 +24,20 @@ class RelayIntf(object):
       GPIO.output(self.gpio_pin, GPIO.LOW)
     def __del__(self):
       GPIO.cleanup()
-    def open_door(self, open_time=10):
-      try: 
+    def open_relay(self, open_time):
+      try:
         # open door
         GPIO.output(self.gpio_pin, GPIO.HIGH)
         time.sleep(open_time)
         # close door
         GPIO.output(self.gpio_pin, GPIO.LOW)
-        return True
       except RuntimeError as e:
         log('GPIO not available. Privilege issue?')
         log(e)
-        return False
+    def open_door(self, open_time=10):
+      t = threading.Thread(target=bt_comm.send_heartbeat)
+      t.setDaemon(True)
+      t.start()
 
 class Gatekeeper(object):
   def __init__(self, relay, config):
