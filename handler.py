@@ -35,7 +35,7 @@ class RelayIntf(object):
         log('GPIO not available. Privilege issue?')
         log(e)
     def open_door(self, open_time=10):
-      t = threading.Thread(target=self.relay_high, args=open_time)
+      t = threading.Thread(target=self.relay_high, args=[open_time])
       t.setDaemon(True)
       t.start()
 
