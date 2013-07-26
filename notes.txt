@@ -1,0 +1,22 @@
+# http://werkzeug.pocoo.org/docs/installation/#virtualenv
+# http://werkzeug.pocoo.org/docs/tutorial/#introducing-shortly
+
+# Bluetooth on Raspbian:
+sudo apt-get --fix-missing install bluetooth
+sudo apt-get install bluez-utils blueman
+
+hcitool dev # this is the local device
+hcitool scan # reveals the remote device
+
+# XXXX is the pairing code
+echo "XXXX" | sudo bluez-simple-agent hci0 00:12:05:14:00:50
+
+sudo bluez-test-device trusted 00:12:05:14:00:50 yes
+
+sudo vi /etc/bluetooth/rfcomm.conf
+# In this file, we setup the appropriate parameters for our device to get a com port. 
+
+sudo /etc/init.d/bluetooth restart
+
+# And test that it works
+python -m serial.tools.miniterm /dev/rfcomm0 38400

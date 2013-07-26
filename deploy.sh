@@ -1,0 +1,8 @@
+#/bin/bash
+
+# This is to copy thing over. In addition, to setup the virtualenv in our production space, do:
+# virtualenv prod
+# pip -r requirements.txt (which lives in the repo but isn't copied)
+
+hg archive -I . -X "*.txt" -X "*.sh" /var/www/; sudo chown -R www-data:www-data /var/www/buzzer/*
+sudo /etc/init.d/lighttpd restart
