@@ -41,9 +41,11 @@ class Gatekeeper(object):
   def __init__(self, relay, config):
     print config
     self.relay = relay
-    log("Twilio")
-    log(os.environ['TWILIO_ACCOUNT_SID'])
-    self.AccountSid=os.environ['TWILIO_ACCOUNT_SID'] 
+    try:
+	self.AccountSid=os.environ['TWILIO_ACCOUNT_SID'] 
+    except e: 
+       log("Problem with Twilio?")
+       log(str(e))
     self.db = create_engine('sqlite:///callers.sqlite')
 
   class Caller(declarative_base()):
