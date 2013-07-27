@@ -20,7 +20,7 @@ class RelayIntf(object):
       self.gpio_pin = config['gpio_pin']
       self.gpio_path = config['gpio_path']
       try:
-	      call([self.gpio_path, "mode",  str(self.gpio_pin), "out"])
+        call([self.gpio_path, "mode",  str(self.gpio_pin), "out"])
       except e:
         log('GPIO problem') 
         log(e)
