@@ -1,4 +1,6 @@
-#!/usr/bin/python
+#!/var/www/buzzer/pythonws/prod/bin/python
+
+# This is so we can properly suid
 
 activate_this = './prod/bin/activate_this.py'
 execfile(activate_this, dict(__file__=activate_this))
