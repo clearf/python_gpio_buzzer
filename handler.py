@@ -20,7 +20,7 @@ class RelayIntf(object):
       self.gpio_pin = config['gpio_pin']
       try:
 	      call(['gpio', "mode",  str(self.gpio_pin), "out"])
-      except RuntimeError as e:
+      except e:
         log('GPIO problem') 
         log(e)
     def __del__(self): 
@@ -32,7 +32,7 @@ class RelayIntf(object):
         time.sleep(open_time)
         # close door
         call(['gpio', "write", str(self.gpio_pin), "0"])
-      except RuntimeError as e:
+      except e:
         log('GPIO problem') 
         log(e)
     def open_door(self, open_time=10):
