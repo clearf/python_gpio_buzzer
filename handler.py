@@ -118,8 +118,12 @@ def make_app(config_file="./config"):
           print "Unable to write config: ", e
     return config
   config = generate_config(config_file)
+  log("Loading...")
+  log(os.environ['TWILIO_ACCOUNT_SID'])
   relay = RelayIntf(config)
+  log("Relay Loaded...")
   web_app = Gatekeeper(relay, config)
+  log("Gatekeeper Loaded...")
   return web_app
 
 if __name__ == '__main__':
