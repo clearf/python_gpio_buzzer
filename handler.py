@@ -32,7 +32,7 @@ class RelayIntf(object):
         call([self.gpio_path, "write", str(self.gpio_pin), "1"])
         time.sleep(open_time)
         # close door
-        call(['gpio', "write", str(self.gpio_pin), "0"])
+        call([self.gpio_path, "write", str(self.gpio_pin), "0"])
       except e:
         log('GPIO problem') 
         log(e)
@@ -124,7 +124,6 @@ def make_app(config_file="./config"):
     return config
   config = generate_config(config_file)
   log("Loading...")
-  log(os.environ['TWILIO_ACCOUNT_SID'])
   relay = RelayIntf(config)
   log("Relay Loaded...")
   web_app = Gatekeeper(relay, config)
