@@ -8,8 +8,7 @@ from sqlalchemy import create_engine, Column, String, Boolean, Date, or_
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import date
-
-import RPi.GPIO as GPIO
+from subprocess import call
 
 syslog.openlog(ident='buzzer', facility=syslog.LOG_LOCAL2)
 
@@ -19,20 +18,18 @@ def log(message):
 class RelayIntf(object):
     def __init__(self, config):
       self.gpio_pin = config['gpio_pin']
-      GPIO.setmode(GPIO.BCM) # to use RPi board pinouts
-      GPIO.setup(self.gpio_pin, GPIO.OUT)
-      GPIO.output(self.gpio_pin, GPIO.LOW)
-    def __del__(self):
-      GPIO.cleanup()
+      call(['gpio', "mode %s out" % self.gpio_pin ])
+    def __del__(self): 
+      call(['gpio', "mode %s in" % self.gpio_pin ])
     def relay_high(self, open_time):
       try:
         # open door
-        GPIO.output(self.gpio_pin, GPIO.HIGH)
+        call( ['gpio', "write %s 1" % self.gpio_pin ])
         time.sleep(open_time)
         # close door
-        GPIO.output(self.gpio_pin, GPIO.LOW)
+        call( ['gpio', "write %s 0" % self.gpio_pin ])
       except RuntimeError as e:
-        log('GPIO not available. Privilege issue?')
+        log('GPIO problem') 
         log(e)
     def open_door(self, open_time=10):
       t = threading.Thread(target=self.relay_high, args=[open_time])
@@ -106,7 +103,7 @@ def make_app(config_file="./config"):
           f.close()
     except IOError as e:
         print 'Using default config'
-        config={'gpio_pin': 7} 
+        config={'gpio_pin': 11} 
         try: 
           # If the config file doesn't exist, write it
             print "Writing config to file"
