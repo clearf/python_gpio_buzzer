@@ -41,7 +41,8 @@ class Gatekeeper(object):
   def __init__(self, relay, config):
     print config
     self.relay = relay
-    log("Twilio", os.environ['TWILIO_ACCOUNT_SID'])
+    log("Twilio")
+    log(os.environ['TWILIO_ACCOUNT_SID'])
     self.AccountSid=os.environ['TWILIO_ACCOUNT_SID'] 
     self.db = create_engine('sqlite:///callers.sqlite')
 
