@@ -1,1 +1,1 @@
-{"gpio_pin": 11}
+{'gpio_pin': 11, 'gpio_path': '/usr/local/bin/gpio'} 

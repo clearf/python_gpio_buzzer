@@ -18,17 +18,18 @@ def log(message):
 class RelayIntf(object):
     def __init__(self, config):
       self.gpio_pin = config['gpio_pin']
+      self.gpio_path = config['gpio_path']
       try:
-	      call(['gpio', "mode",  str(self.gpio_pin), "out"])
+	      call([self.gpio_path, "mode",  str(self.gpio_pin), "out"])
       except e:
         log('GPIO problem') 
         log(e)
     def __del__(self): 
-      call(['gpio', "mode",  str(self.gpio_pin), "in"])
+      call([self.gpio_path, "mode",  str(self.gpio_pin), "in"])
     def relay_high(self, open_time):
       try:
         # open door
-        call(['gpio', "write", str(self.gpio_pin), "1"])
+        call([self.gpio_path, "write", str(self.gpio_pin), "1"])
         time.sleep(open_time)
         # close door
         call(['gpio', "write", str(self.gpio_pin), "0"])
@@ -111,7 +112,7 @@ def make_app(config_file="./config"):
           f.close()
     except IOError as e:
         print 'Using default config'
-        config={'gpio_pin': 11} 
+        config={'gpio_pin': 11, 'gpio_path': '/usr/local/bin/gpio'} 
         try: 
           # If the config file doesn't exist, write it
             print "Writing config to file"
