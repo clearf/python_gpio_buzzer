@@ -7,7 +7,7 @@
 
 git archive --format tar master | tar -xv -C /var/www/buzzer/pythonws/ 
 sudo chown -R www-data:www-data /var/www/buzzer/*
-sudo chown -R root:www-data /var/www/buzzer/pythonws/buzzer.fcgi
+#sudo chown -R root:www-data /var/www/buzzer/pythonws/buzzer.fcgi
 
 # We've switched to git to deploy. 
 sudo /etc/init.d/lighttpd restart
