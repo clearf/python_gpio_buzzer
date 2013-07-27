@@ -18,16 +18,16 @@ def log(message):
 class RelayIntf(object):
     def __init__(self, config):
       self.gpio_pin = config['gpio_pin']
-      call(['gpio', "mode %s out" % self.gpio_pin ])
+      call(['gpio', "mode",  str(self.gpio_pin), "out"])
     def __del__(self): 
-      call(['gpio', "mode %s in" % self.gpio_pin ])
+      call(['gpio', "mode",  str(self.gpio_pin), "in"])
     def relay_high(self, open_time):
       try:
         # open door
-        call( ['gpio', "write %s 1" % self.gpio_pin ])
+        call(['gpio', "write", str(self.gpio_pin), "1"])
         time.sleep(open_time)
         # close door
-        call( ['gpio', "write %s 0" % self.gpio_pin ])
+        call(['gpio', "write", str(self.gpio_pin), "0"])
       except RuntimeError as e:
         log('GPIO problem') 
         log(e)
