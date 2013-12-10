@@ -21,7 +21,7 @@ class RelayIntf(object):
       self.gpio_path = config['gpio_path']
       try:
         call([self.gpio_path, "mode",  str(self.gpio_pin), "out"])
-      except e:
+      except Exception as e:
         log('GPIO problem') 
         log(e)
     def __del__(self): 
@@ -33,7 +33,7 @@ class RelayIntf(object):
         time.sleep(open_time)
         # close door
         call([self.gpio_path, "write", str(self.gpio_pin), "0"])
-      except e:
+      except Exception as e:
         log('GPIO problem') 
         log(e)
     def open_door(self, open_time=10):
@@ -48,7 +48,7 @@ class Gatekeeper(object):
     self.relay = relay
     try:
 	self.AccountSid=os.environ['TWILIO_ACCOUNT_SID'] 
-    except e: 
+    except Exception as e: 
        log("Problem with Twilio?")
        log(str(e))
     self.db = create_engine('sqlite:///callers.sqlite')
