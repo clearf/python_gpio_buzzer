@@ -90,9 +90,10 @@ class Gatekeeper(object):
       if self.check_authorized_caller(phoneNumber,False):
         #log("Authorized Caller!")
         if self.relay.open_door():
-          print "opening"
+          log("opening")
           r.reject("Busy") 
         else:
+          log("Not authorized")
           r.say("Error with GPIO"); 
     else:
       r.reject("Busy") 
