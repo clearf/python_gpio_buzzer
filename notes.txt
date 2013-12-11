@@ -16,3 +16,5 @@ cd ~/dev/
 git clone git://git.drogon.net/wiringPi
 
 Relay between 1 & 4
+
+Note, realy is now in wiringpi pin 11 (physical 26). This is also the SPI pin. If I ever need spi later, I'll have to move this. spi has to be disabled (deleted from /etc/modules and added to /etc/modprobe.d/raspi-blacklist.conf)
