@@ -88,7 +88,7 @@ class Gatekeeper(object):
     if AccountSid == self.AccountSid:
       log("Call from %s" % phoneNumber)
       if self.check_authorized_caller(phoneNumber,False):
-        #log("Authorized Caller!")
+        log("Authorized Caller!")
         if self.relay.open_door():
           log("opening")
           r.reject("Busy") 
@@ -96,6 +96,7 @@ class Gatekeeper(object):
           log("Not authorized")
           r.say("Error with GPIO"); 
     else:
+      log("Improper SID sent")
       r.reject("Busy") 
     response = Response(str(r), mimetype='text/xml')
     return response(environ, start_response)
