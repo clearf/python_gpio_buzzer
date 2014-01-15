@@ -36,7 +36,7 @@ class RelayIntf(object):
       except Exception as e:
         log('GPIO problem') 
         log(e)
-    def open_door(self, open_time=10):
+    def open_door(self, open_time=7):
       t = threading.Thread(target=self.relay_high, args=[open_time])
       t.setDaemon(True)
       t.start()
