@@ -93,7 +93,7 @@ class Gatekeeper(object):
       results=session.query(self.Caller).filter(self.Caller.phone_number==phoneNumber, self.Caller.is_test==test_call,
           or_(self.Caller.valid_date==None, self.Caller.valid_date<=date.today() )).all()
       print results
-      return results.first()
+      return results[0]
     except Exception as e:
       log('DB Exception' + str(e))
       return False
