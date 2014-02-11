@@ -39,13 +39,14 @@ class RelayIntf(object):
     def play_sound(self):
       log("Playing sound?")
       call(["/usr/bin/mpg321", "http://s3-us-west-2.amazonaws.com/hobby.lyceum.dyn.dhs.org/buzzer/r2d2-squeaks2.mp3"])
+      log("Played")
     def open_door(self, open_time=10):
       #t = threading.Thread(target=self.relay_high, args=[open_time])
       #t.setDaemon(True)
       #t.start()
-      t = threading.Thread(target=self.play_sound)
-      t.setDaemon(True)
-      t.start()
+      s = threading.Thread(target=self.play_sound)
+      s.setDaemon(True)
+      s.start()
       return True
 
 class Gatekeeper(object):
