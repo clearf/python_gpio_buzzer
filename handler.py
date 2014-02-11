@@ -66,7 +66,7 @@ class Gatekeeper(object):
   class Caller(declarative_base()):
     __tablename__ = 'Caller'
     phone_number=Column(String, primary_key=True)
-    name=Column(Unicode)
+    name=Column(String)
     is_test=Column(Boolean)
     valid_date=Column(Date)
     def __init__(self, phone_number, name, is_test, valid_date=None):
