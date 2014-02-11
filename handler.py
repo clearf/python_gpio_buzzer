@@ -19,6 +19,8 @@ class RelayIntf(object):
     def __init__(self, config):
       self.gpio_pin = config['gpio_pin']
       self.gpio_path = config['gpio_path']
+      self.test_mode = config['test_mode']
+      self.default_open_time = config['default_open_time']
       try:
         call([self.gpio_path, "mode",  str(self.gpio_pin), "out"])
       except Exception as e:
@@ -27,34 +29,31 @@ class RelayIntf(object):
     def __del__(self): 
       call([self.gpio_path, "mode",  str(self.gpio_pin), "in"])
     def relay_high(self, open_time):
-      try:
-        # open door
-        call([self.gpio_path, "write", str(self.gpio_pin), "1"])
-        time.sleep(open_time)
-        # close door
-        call([self.gpio_path, "write", str(self.gpio_pin), "0"])
-      except Exception as e:
-        log('GPIO problem') 
-        log(e)
-    def play_sound(self):
-      log("Playing sound?")
-      try:
-        call(["/usr/bin/mpg321","http://s3-us-west-2.amazonaws.com/hobby.lyceum.dyn.dhs.org/buzzer/r2d2-squeaks2.mp3"])
-      except Exception as e:
-        log('Sound problem') 
-        log(e)
-      log("Played")
-    def open_door(self, open_time=10):
+      if not self.test_mode:
+        try:
+          # open door
+          call([self.gpio_path, "write", str(self.gpio_pin), "1"])
+          time.sleep(open_time)
+          # close door
+          call([self.gpio_path, "write", str(self.gpio_pin), "0"])
+        except Exception as e:
+          log('GPIO problem') 
+          log(e)
+      else: 
+        log('Test mode, no opening')
+    def open_door(self, open_time=None):
+      if not open_time:
+        open_time=self.default_open_time
       t = threading.Thread(target=self.relay_high, args=[open_time])
       t.setDaemon(True)
       t.start()
-      self.play_sound()
       return True
 
 class Gatekeeper(object):
   def __init__(self, relay, config):
     print config
     self.relay = relay
+    self.tts_path = config['tts_path']
     try:
 	self.AccountSid=os.environ['TWILIO_ACCOUNT_SID'] 
     except Exception as e: 
@@ -76,6 +75,17 @@ class Gatekeeper(object):
     def __repr__(self):
       return "<Caller('%s', '%s', '%s', '%s')>" % (self.phone_number, self.name, self.is_test, str(self.valid_date))
 
+  def speak_message(self, message):
+    def speak_message(message):
+      call([self.tts_path, message % name])
+    try:
+      t = threading.Thread(target=speak_message, args=[message])
+      t.setDaemon(True)
+      t.start()
+    except Exception as e:
+      log('Sound problem') 
+      log(e)
+    log("Played")
   def check_authorized_caller(self, phoneNumber, test_call):
     try: 
       Session = sessionmaker(bind=self.db)
@@ -83,11 +93,10 @@ class Gatekeeper(object):
       results=session.query(self.Caller).filter(self.Caller.phone_number==phoneNumber, self.Caller.is_test==test_call,
           or_(self.Caller.valid_date==None, self.Caller.valid_date<=date.today() )).all()
       print results
-      return results != []
+      return [results != [], results]
     except Exception as e:
       log('DB Exception' + str(e))
       return False
-
 
   def application(self, environ, start_response):
     request = Request(environ)
@@ -97,14 +106,17 @@ class Gatekeeper(object):
     # Make sure the impostors at least know my acct key
     if AccountSid == self.AccountSid:
       log("Call from %s" % phoneNumber)
-      if self.check_authorized_caller(phoneNumber,False):
-        log("Authorized Caller!")
+      [authorized_caller, results] = self.check_authorized_caller(phoneNumber,False)
+      if authorized_caller: 
+        log("Authorized Caller: %s" % results.name)
         if self.relay.open_door():
           log("opening")
+          self.speak_message("Welcome %s" % results.name)
           r.reject("Busy") 
         else:
           log("Not authorized")
           r.say("Error with GPIO"); 
+          self.speak_message("Error when buzzing in " % results.name)
     else:
       log("Improper SID sent")
       r.reject("Busy") 
@@ -124,7 +136,8 @@ def make_app(config_file="./config"):
           f.close()
     except IOError as e:
         print 'Using default config'
-        config={'gpio_pin': 11, 'gpio_path': '/usr/local/bin/gpio'} 
+        config={'gpio_pin': 11, 'gpio_path': '/usr/local/bin/gpio', 'tts_path': '/var/www/buzzer/pythonws/text_to_speech.sh', 
+            'test_mode': False, 'default_open_time': 10} 
         try: 
           # If the config file doesn't exist, write it
             print "Writing config to file"
