@@ -37,7 +37,7 @@ class RelayIntf(object):
       except Exception as e:
         log('GPIO problem') 
         log(e)
-    def open_door(self, open_time=7):
+    def open_door(self, open_time=10):
       t = threading.Thread(target=self.relay_high, args=[open_time])
       t.setDaemon(True)
       t.start()
@@ -90,9 +90,14 @@ class Gatekeeper(object):
       log("Call from %s" % phoneNumber)
       if self.check_authorized_caller(phoneNumber,False):
         log("Authorized Caller!")
-        if self.relay.open_door():
-          subprocess.check_output(["/usr/bin/mpg321", 
-            "http://s3-us-west-2.amazonaws.com/hobby.lyceum.dyn.dhs.org/buzzer/r2d2-squeaks2.mp3"])
+        if True:
+          try:
+            subprocess.check_output(["/usr/bin/mpg321", 
+              "http://s3-us-west-2.amazonaws.com/hobby.lyceum.dyn.dhs.org/buzzer/r2d2-squeaks2.mp3"])
+          except subprocess.CalledProcessError as e:
+            log('Exception' + str(e))
+            r.reject("Busy")
+        elif self.relay.open_door():
           log("opening")
           r.reject("Busy") 
         else:
