@@ -94,7 +94,7 @@ class Gatekeeper(object):
           try:
             subprocess.check_call(["/usr/bin/mpg321", 
               "http://s3-us-west-2.amazonaws.com/hobby.lyceum.dyn.dhs.org/buzzer/r2d2-squeaks2.mp3"])
-          except subprocess.CalledProcessError as e:
+          except Exception as e:
             log('Exception' + str(e))
             log(e.output)
             r.reject("Busy")
