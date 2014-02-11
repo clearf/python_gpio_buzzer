@@ -48,9 +48,10 @@ class RelayIntf(object):
       #t = threading.Thread(target=self.relay_high, args=[open_time])
       #t.setDaemon(True)
       #t.start()
-      s = threading.Thread(target=self.play_sound)
+      #s = threading.Thread(target=self.play_sound)
       #s.setDaemon(True)
-      s.start()
+      #s.start()
+      self.play_sound()
       return True
 
 class Gatekeeper(object):
