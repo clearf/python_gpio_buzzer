@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 import time
 import os
 import threading
@@ -111,7 +114,7 @@ class Gatekeeper(object):
         log("Authorized Caller: %s" % result.name)
         if self.relay.open_door():
           log("opening")
-          self.speak_message("Welcome %s" % result.name)
+          self.speak_message("Welcome home, %s" % result.name)
           r.reject("Busy") 
         else:
           log("Not authorized")
