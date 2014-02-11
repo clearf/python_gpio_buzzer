@@ -80,8 +80,8 @@ class Gatekeeper(object):
       return False
 
   def play_sound(self):
+    log("Playing sound?")
     call(["/usr/bin/mpg321", "http://s3-us-west-2.amazonaws.com/hobby.lyceum.dyn.dhs.org/buzzer/r2d2-squeaks2.mp3"])
-
 
   def application(self, environ, start_response):
     request = Request(environ)
