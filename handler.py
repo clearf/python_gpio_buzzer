@@ -75,7 +75,7 @@ class Gatekeeper(object):
       self.is_test =  is_test
       self.valid_date=valid_date
     def __repr__(self):
-      return "<Caller('%U', '%U', '%U', '%U')>" % (self.phone_number, self.name, self.is_test, str(self.valid_date))
+      return "<Caller('%s', '%s', '%s', '%s')>" % (self.phone_number, self.name, self.is_test, str(self.valid_date))
 
   def speak_message(self, message):
     def speak_message(message):
@@ -107,13 +107,13 @@ class Gatekeeper(object):
     AccountSid=request.args.get('AccountSid')
     # Make sure the impostors at least know my acct key
     if AccountSid == self.AccountSid:
-      log("Call from %U" % phoneNumber)
+      log("Call from %s" % phoneNumber)
       result = self.check_authorized_caller(phoneNumber,False)
       if result: 
-        log("Authorized Caller: %U" % result.name)
+        log("Authorized Caller: %s" % result.name)
         if self.relay.open_door():
           log("opening")
-          self.speak_message("Welcome home, %U" % result.name)
+          self.speak_message("Welcome home, %s" % result.name)
           r.reject("Busy") 
         else:
           log("Not authorized")
