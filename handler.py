@@ -1,5 +1,6 @@
 import time
 import os
+import subprocess
 import threading
 from werkzeug.wrappers import Request, Response
 from twilio import twiml
@@ -90,6 +91,8 @@ class Gatekeeper(object):
       if self.check_authorized_caller(phoneNumber,False):
         log("Authorized Caller!")
         if self.relay.open_door():
+          subprocess.check_output(["/usr/bin/mpg321", 
+            "http://s3-us-west-2.amazonaws.com/hobby.lyceum.dyn.dhs.org/buzzer/r2d2-squeaks2.mp3"])
           log("opening")
           r.reject("Busy") 
         else:
