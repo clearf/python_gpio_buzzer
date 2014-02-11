@@ -93,7 +93,7 @@ class Gatekeeper(object):
       results=session.query(self.Caller).filter(self.Caller.phone_number==phoneNumber, self.Caller.is_test==test_call,
           or_(self.Caller.valid_date==None, self.Caller.valid_date<=date.today() )).all()
       print results
-      return [results != [], results]
+      return [results != [], results.first()]
     except Exception as e:
       log('DB Exception' + str(e))
       return False
@@ -106,12 +106,12 @@ class Gatekeeper(object):
     # Make sure the impostors at least know my acct key
     if AccountSid == self.AccountSid:
       log("Call from %s" % phoneNumber)
-      [authorized_caller, results] = self.check_authorized_caller(phoneNumber,False)
+      [authorized_caller, result] = self.check_authorized_caller(phoneNumber,False)
       if authorized_caller: 
-        log("Authorized Caller: %s" % results.name)
+        log("Authorized Caller: %s" % result.name)
         if self.relay.open_door():
           log("opening")
-          self.speak_message("Welcome %s" % results.name)
+          self.speak_message("Welcome %s" % result.name)
           r.reject("Busy") 
         else:
           log("Not authorized")
