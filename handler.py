@@ -45,12 +45,9 @@ class RelayIntf(object):
         log(e)
       log("Played")
     def open_door(self, open_time=10):
-      #t = threading.Thread(target=self.relay_high, args=[open_time])
-      #t.setDaemon(True)
-      #t.start()
-      #s = threading.Thread(target=self.play_sound)
-      #s.setDaemon(True)
-      #s.start()
+      t = threading.Thread(target=self.relay_high, args=[open_time])
+      t.setDaemon(True)
+      t.start()
       self.play_sound()
       return True
 
