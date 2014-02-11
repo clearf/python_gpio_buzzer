@@ -1,1 +1,1 @@
-{"tts_path": "/var/www/buzzer/pythonws/text_to_speech.sh", "gpio_path": "/usr/local/bin/gpio", "gpio_pin": 11, "test_mode": true, "default_open_time": 10}
+{"tts_path": "/var/www/buzzer/pythonws/text_to_speech.sh", "gpio_path": "/usr/local/bin/gpio", "gpio_pin": 11, "test_mode": false, "default_open_time": 10}
