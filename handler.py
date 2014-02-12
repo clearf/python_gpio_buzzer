@@ -80,7 +80,7 @@ class Gatekeeper(object):
 
   def speak_message(self, message):
     def speak_message(message):
-      #call([self.tts_path, message])
+      call([self.tts_path, message])
       log("%s" % message)
     try:
       t = threading.Thread(target=speak_message, args=[message])
@@ -89,7 +89,6 @@ class Gatekeeper(object):
     except Exception as e:
       log('Sound problem') 
       log(e)
-    log("Played")
   def check_authorized_caller(self, phoneNumber, test_call):
     try: 
       Session = sessionmaker(bind=self.db)
