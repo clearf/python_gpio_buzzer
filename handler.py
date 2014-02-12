@@ -80,8 +80,8 @@ class Gatekeeper(object):
 
   def speak_message(self, message):
     def speak_message(message):
-      log("%s" % message.encode(sys.getfilesystemencoding()))
-      call([self.tts_path, message.encode(sys.getfilesystemencoding())])
+      call([self.tts_path, werkzeug.urls.url_quote(message)])
+      log("%s" % message)
     try:
       t = threading.Thread(target=speak_message, args=[message])
       t.setDaemon(True)
