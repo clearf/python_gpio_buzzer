@@ -79,7 +79,8 @@ class Gatekeeper(object):
 
   def speak_message(self, message):
     def speak_message(message):
-      call([self.tts_path, message])
+      #call([self.tts_path, message])
+      print("%s" % message)
     try:
       t = threading.Thread(target=speak_message, args=[message])
       t.setDaemon(True)
