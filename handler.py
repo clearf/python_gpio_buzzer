@@ -15,7 +15,7 @@ from subprocess import call
 syslog.openlog(ident='buzzer', facility=syslog.LOG_LOCAL2)
 
 def log(message):
-  syslog.syslog(str(message))
+  syslog.syslog(message.encode('utf-8'))
 
 class RelayIntf(object):
     def __init__(self, config):
