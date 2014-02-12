@@ -75,12 +75,13 @@ class Gatekeeper(object):
       self.is_test =  is_test
       self.valid_date=valid_date
     def __repr__(self):
-      return "<Caller('%s', '%s', '%s', '%s')>" % (self.phone_number, self.name, self.is_test, str(self.valid_date))
+      return "<Caller('%s', '%s', '%s', '%s')>" % (self.phone_number, self.name.encode("ascii", 'ignore'), 
+          self.is_test, str(self.valid_date))
 
   def speak_message(self, message):
     def speak_message(message):
       #call([self.tts_path, message])
-      print("%s" % message)
+      log("%s" % message)
     try:
       t = threading.Thread(target=speak_message, args=[message])
       t.setDaemon(True)
