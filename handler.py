@@ -4,6 +4,7 @@ import time
 import os
 import threading
 from werkzeug.wrappers import Request, Response
+from werkzeug.urls import url_quote 
 from twilio import twiml
 import syslog
 from sqlalchemy import create_engine, Column, String, Boolean, Date, or_
@@ -80,8 +81,8 @@ class Gatekeeper(object):
 
   def speak_message(self, message):
     def speak_message(message):
-      call([self.tts_path, werkzeug.urls.url_quote(message)])
-      log("%s" % message)
+      log("%s" % url_quote(message))
+      call([self.tts_path, url_quote(message)])
     try:
       t = threading.Thread(target=speak_message, args=[message])
       t.setDaemon(True)
