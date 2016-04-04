@@ -5,6 +5,10 @@ import os
 import threading
 from werkzeug.wrappers import Request, Response
 from werkzeug.urls import url_quote 
+from werkzeug.routing import Map, Rule
+from werkzeug.exceptions import HTTPException, NotFound
+from werkzeug.utils import redirect
+from jinja2 import Environment, FileSystemLoader
 from twilio import twiml
 import syslog
 from sqlalchemy import create_engine, Column, String, Boolean, Date, or_
@@ -16,7 +20,10 @@ from subprocess import call
 syslog.openlog(ident='buzzer', facility=syslog.LOG_LOCAL2)
 
 def log(message):
-  syslog.syslog(message.encode('utf-8'))
+    try:
+     syslog.syslog(message.encode('utf-8'))
+    except Exception as e:
+     print "Can't log %s" % str(e)
 
 class RelayIntf(object):
     def __init__(self, config):
@@ -57,6 +64,14 @@ class Gatekeeper(object):
     print config
     self.relay = relay
     self.tts_path = config['tts_path']
+    template_path = os.path.join(os.path.dirname(__file__), 'templates')
+    self.jinja_env = Environment(loader=FileSystemLoader(template_path),
+                                 autoescape=True)
+    self.url_map = Map([
+       Rule('/call', endpoint='call'),
+      Rule('/manual', endpoint='manual'),
+    ])
+    
     try:
 	self.AccountSid=os.environ['TWILIO_ACCOUNT_SID'] 
     except Exception as e: 
@@ -79,6 +94,7 @@ class Gatekeeper(object):
       return "<Caller('%s', '%s', '%s', '%s')>" % (self.phone_number, self.name.encode("ascii", 'ignore'), 
           self.is_test, str(self.valid_date))
 
+
   def speak_message(self, message):
     def speak_message(message):
       log("%s" % url_quote(message))
@@ -90,6 +106,7 @@ class Gatekeeper(object):
     except Exception as e:
       log('Sound problem') 
       log(e)
+
   def check_authorized_caller(self, phoneNumber, test_call):
     try: 
       Session = sessionmaker(bind=self.db)
@@ -102,8 +119,35 @@ class Gatekeeper(object):
       log('DB Exception' + str(e))
       return False
 
+
+  def render_template(self, template_name, **context):
+    t = self.jinja_env.get_template(template_name)
+    return Response(t.render(context), mimetype='text/html')
+
+  def dispatch_request(self, request):
+    adapter = self.url_map.bind_to_environ(request.environ)
+    try:
+        endpoint, values = adapter.match()
+        return getattr(self, 'on_' + endpoint)(request, **values)
+    except HTTPException, e:
+        return e
+  
   def application(self, environ, start_response):
     request = Request(environ)
+    response = self.dispatch_request(request)
+    return response(environ, start_response)
+
+  def on_manual(self, request):
+    phoneNumber=request.args.get('From')
+    AccountSid=request.args.get('AccountSid')
+    return self.render_template('manual.html', From=phoneNumber, AccountSid=AccountSid)
+
+
+  def on_call(self, request):
+    if request.method == 'GET':
+      print "Boolean"
+      return redirect('/manual')
+
     r=twiml.Response()
     phoneNumber=request.args.get('From')
     AccountSid=request.args.get('AccountSid')
@@ -125,7 +169,7 @@ class Gatekeeper(object):
       log("Improper SID sent")
       r.reject("Busy") 
     response = Response(str(r), mimetype='text/xml')
-    return response(environ, start_response)
+    return response
 
   def __call__(self, environ, start_response):
     return self.application(environ, start_response)
