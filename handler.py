@@ -147,10 +147,10 @@ class Gatekeeper(object):
     if request.method == 'GET':
       print "Boolean"
       return redirect('/manual')
-
+    print request.form
     r=twiml.Response()
-    phoneNumber=request.args.get('From')
-    AccountSid=request.args.get('AccountSid')
+    phoneNumber=request.form['From']
+    AccountSid=request.form['AccountSid']
     # Make sure the impostors at least know my acct key
     if AccountSid == self.AccountSid:
       log("Call from %s" % phoneNumber)
