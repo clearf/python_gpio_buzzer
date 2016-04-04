@@ -8,6 +8,7 @@ from werkzeug.urls import url_quote
 from werkzeug.routing import Map, Rule
 from werkzeug.exceptions import HTTPException, NotFound
 from werkzeug.utils import redirect
+from werkzeug.wsgi import SharedDataMiddleware
 from jinja2 import Environment, FileSystemLoader
 from twilio import twiml
 import syslog
@@ -200,6 +201,9 @@ def make_app(config_file="./config"):
   relay = RelayIntf(config)
   log("Relay Loaded...")
   web_app = Gatekeeper(relay, config)
+  web_app = SharedDataMiddleware(web_app, {
+            '/static':  os.path.join(os.path.dirname(__file__), 'static')
+  })
   log("Gatekeeper Loaded...")
   return web_app
 

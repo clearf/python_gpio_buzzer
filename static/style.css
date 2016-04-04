@@ -21,4 +21,14 @@ input[type='submit']
    -webkit-appearance: none;
    -moz-appearance: none;
    appearance: none;  
+   height: 500px;
+   width: 100%;
+   font-size: 350%;
 }
+
+/* input[type="button"] {
+-webkit-appearance: button;
+height:40px;
+}
+*/
+
