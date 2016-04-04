@@ -166,7 +166,7 @@ class Gatekeeper(object):
           r.say("Error with GPIO"); 
           self.speak_message("Error when buzzing in " % results.name)
     else:
-      log("Improper SID sent")
+      log("Improper SID sent: %s" % AccountSid)
       r.reject("Busy") 
     response = Response(str(r), mimetype='text/xml')
     return response
