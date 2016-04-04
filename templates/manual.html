@@ -1,8 +1,6 @@
-<html>
-<head>
-<title>These aren't the droids...</title>
-</head>
+{% extends "layout.html" %}
 
+{% block body %}
 <form action="./call" method="post">
 
     <input type="hidden" name="From" value="{{ From }}">
@@ -10,3 +8,4 @@
 
   <input type="submit" value="Open/Close">
 </form>
+{% endblock %}
