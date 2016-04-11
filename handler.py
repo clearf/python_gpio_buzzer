@@ -35,8 +35,8 @@ class RelayIntf(object):
       try:
         call([self.gpio_path, "mode",  str(self.gpio_pin), "out"])
       except Exception as e:
-        log('GPIO problem') 
-        log(e)
+        log('GPIO problem in init') 
+        log(str(e))
     def __del__(self): 
       call([self.gpio_path, "mode",  str(self.gpio_pin), "in"])
     def relay_high(self, open_time):
@@ -51,7 +51,7 @@ class RelayIntf(object):
           log('Closed')
         except Exception as e:
           log('GPIO problem') 
-          log(e)
+          log(str(e))
       else: 
         log('Test mode, no opening')
     def open_door(self, open_time=None):
