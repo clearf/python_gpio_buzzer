@@ -44,7 +44,7 @@ class RelayIntf(object):
         try:
           # open door
           call([self.gpio_path, "write", str(self.gpio_pin), "1"])
-          log('Open' + str(open_time))
+          log('Open ' + str(open_time))
           time.sleep(open_time)
           # close door
           call([self.gpio_path, "write", str(self.gpio_pin), "0"])
