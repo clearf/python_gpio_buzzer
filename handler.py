@@ -15,6 +15,7 @@ import syslog
 from sqlalchemy import create_engine, Column, String, Boolean, Date, or_
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 from datetime import date
 from subprocess import call
 
@@ -82,20 +83,35 @@ class Gatekeeper(object):
        log(str(e))
     self.db = create_engine('sqlite:///callers.sqlite')
 
+    """CREATE TABLE "Caller" (
+        phone_number VARCHAR NOT NULL,
+        name VARCHAR,
+        is_test BOOLEAN,
+        valid_date DATE, 
+        skip_pin BOOLEAN,
+        pin CHAR(4),
+        PRIMARY KEY (phone_number),
+        CHECK (is_test IN (0, 1))
+    );"""
+
   class Caller(declarative_base()):
     __tablename__ = 'Caller'
     phone_number=Column(String, primary_key=True)
     name=Column(String)
     is_test=Column(Boolean)
+    skip_pin=Column(Boolean)
+    pin=Column(String)
     valid_date=Column(Date)
-    def __init__(self, phone_number, name, is_test, valid_date=None):
+    def __init__(self, phone_number, name, is_test, pin, skip_pin=False, valid_date=None):
       self.phone_number = phone_number
       self.name = name
       self.is_test =  is_test
+      self.skip_pin =  skip_pin
+      self.pin = pin
       self.valid_date=valid_date
     def __repr__(self):
-      return "<Caller('%s', '%s', '%s', '%s')>" % (self.phone_number, self.name.encode("ascii", 'ignore'), 
-          self.is_test, str(self.valid_date))
+      return "<Caller('%s', '%s', '%s', '%s', '%s', '%s')>" % (self.phone_number, self.name.encode("ascii", 'ignore'), 
+          self.is_test, self.skip_pin, self.pin,  str(self.valid_date))
 
 
   def speak_message(self, message):
@@ -110,16 +126,35 @@ class Gatekeeper(object):
       log('Sound problem') 
       log(e)
 
-  def check_authorized_caller(self, phoneNumber, test_call):
+  def check_authorized_caller(self, phoneNumber, r, gathered_pin=None, test_call=False):
     try: 
       Session = sessionmaker(bind=self.db)
       session=Session()
-      results=session.query(self.Caller).filter(self.Caller.phone_number==phoneNumber, self.Caller.is_test==test_call,
-          or_(self.Caller.valid_date==None, self.Caller.valid_date<=date.today() )).all()
-      print results
-      return results[0]
-    except Exception as e:
-      log('DB Exception' + str(e))
+      caller=session.query(self.Caller).filter(self.Caller.phone_number==phoneNumber, self.Caller.is_test==test_call,
+          or_(self.Caller.valid_date==None, self.Caller.valid_date<=date.today() )).one()
+      if not caller.skip_pin:
+          log('... needs pin')
+          if gathered_pin==None:
+            with r.gather(numDigits=4) as gather:
+                gather.say('Please enter your four-digit pin')
+            return False;
+          elif caller.pin: 
+              log('Woring with the caller pin')
+              if gathered_pin==caller.pin:
+                  return caller;
+          elif gathered_pin==phoneNumber[-4:]:
+              return caller;
+          log(phoneNumber + ': incorrect pin(' + gathered_pin + ')')
+          r.say("Incorrect pin")
+          return False;
+      else: 
+        return caller
+    except NoResultFound as e:
+      log('Unauthorized Caller?: No results for ' + phoneNumber + ' ' + str(e))
+      return False
+    except MultipleResultsFound as e:
+      # This shouldn't happen – there's a database cosntraint
+      log('Multiple results found ' + str(e))
       return False
 
 
@@ -154,15 +189,18 @@ class Gatekeeper(object):
     r=twiml.Response()
     phoneNumber=request.form['From']
     AccountSid=request.form['AccountSid']
+    if 'Digits' in request.form: 
+        gatheredPin = request.form['Digits']
+    else: 
+        gatheredPin = None
     # Make sure the impostors at least know my acct key
     if AccountSid == self.AccountSid:
       log("Call from %s" % phoneNumber)
-      result = self.check_authorized_caller(phoneNumber,False)
+      result = self.check_authorized_caller(phoneNumber, r, gathered_pin=gatheredPin)
       if result: 
         log("Authorized Caller: %s" % result.name)
         if self.relay.open_door():
-          log("opening")
-          self.speak_message("Welcome home, %s" % result.name)
+          self.speak_message("Opening; Welcome home, %s" % result.name)
           r.reject("Busy") 
         else:
           log("Not authorized")
